@@ -1,26 +1,43 @@
+const path = require('path');
+const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
+
+const DEV_PORT = process.env.PORT || 3000;
+
 module.exports = {
-    mode: "development",
-    entry: "./src/index.tsx",
-    output: {
-      filename: "bundle.js"
-    },
-    devServer: {
-      contentBase: "./public",
-      compress: true,
-      hot: true,
-      host: "localhost",
-      port: 3000,
-      publicPath: "/"
-    },
-    resolve: {
-      extensions: [".ts", ".tsx", ".js"]
-    },
-    module: {
-      rules: [
+  entry: './src/index.js',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: { presets: ['@babel/env'] },
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
+  output: {
+    path: path.resolve(__dirname, 'build/'),
+    filename: 'bundle.js',
+  },
+  devServer: {
+    contentBase: path.join(__dirname, 'build/'),
+    port: DEV_PORT,
+    hot: true,
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new CopyPlugin({
+      patterns: [
         {
-          test: /\.tsx?$/,
-          use: [{ loader: "ts-loader" }]
-        }
-      ]
-    }
-  };
+          from: "./public",
+          to: "."
+        },
+      ],
+    })
+  ],
+};
