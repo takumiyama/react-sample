@@ -16,4 +16,4 @@ jobs:
 
     - name: Build Image
       run: |
-        npm run build
+        npm install && npm run build
