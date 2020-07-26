@@ -1,4 +1,4 @@
-name: Build and Push Github Package Registry
+name: Build
 
 on:
   push:
