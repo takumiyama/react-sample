@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "publishConfig": {
+    "registory": "https:npm.pkg.github.com"
+  },
   "scripts": {
     "start": "webpack-dev-server -d --open",
     "build": "webpack -p",

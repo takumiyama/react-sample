@@ -1,0 +1,35 @@
+name: Publish
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '!*'
+
+jobs:
+  publish:
+    name: Publish package
+    env:
+      TZ: Asia/Tokyo
+    runs-on: ubuntu-latest
+    steps:
+      - users: actions/checkout@v2
+      - users: actions/setup-node@v1
+      with:
+        node-version: '14.2.0'
+        registry-url: 'https://npm.pkg.github.com'
+      - name: restore workspace
+        users: actions/cache@v2
+        with:
+          path: |
+            node_modules
+          key: v3-yarn-${{ runner.os }}-${{ hashFiles('**/.node-version') }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            v3-yarn-${{ runner.os }}-${{ hashFiles('**/.node-version') }}-${{ hashFiles('**/yarn.lock') }}
+            v3-yarn-${{ runner.os }}-${{ hashFiles('**/.node-version') }}
+            v3-yarn-${{ runner.os }}
+      - run: yarn install --frozen-lockfile
+      - name: publish
+        run : npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.gh-publish-packages }}

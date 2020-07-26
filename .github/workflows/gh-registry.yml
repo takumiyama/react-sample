@@ -20,4 +20,4 @@ jobs:
         npm run build
         mv ./build ./react
         tar -czf react.tar.gz react
-        rm react
+        rm -rf react
