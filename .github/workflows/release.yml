@@ -1,0 +1,140 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+      - release
+      - develop
+    tags:
+      - '!*'
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+    - uses: actions/checkout@v2
+
+    # Version取得
+    - name: Set software version
+      id: software_version
+      run: |
+        VERSION=$(cat package.json | grep version | cut -d " " -f 4 | tr -d "," | tr -d '"')
+        echo ::set-output name=version::${VERSION}
+        echo ${VERSION}
+
+    # Node
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    # Front install
+    - name: Install Front modules
+      env:
+        TZ: Asia/Tokyo
+      run: npm install
+
+    # Front Build
+    - name: Build Front modules
+      env:
+        TZ: Asia/Tokyo
+      run: |
+        if [[ ${{ github.ref }} = 'master' ]]; then
+          sh ./script/build.sh
+          echo "master build"
+        elif [[ ${{ github.ref }} = 'release' ]]; then
+          sh ./script/build.sh
+          echo "release build"
+        elif [[ ${{ github.ref }} = 'develop' ]]; then
+          sh ./script/build.sh
+          echo "develop build"
+        else
+          echo "Illegal Branch Name"
+          exit 1
+        fi
+    
+    # 本番リリース作成
+    - name: Create Production Release
+      if: ${{ github.ref == 'master'}}
+      id: create_release
+      uses: actions/create-release@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TZ: Asia/Tokyo
+      with:
+        tag_name: ${{ steps.software_version.outputs.version }}
+        release_name: Release ${{ steps.software_version.outputs.version }}
+        draft: false
+        prerelease: false
+
+    # プレリリース作成(release)
+    - name: Create Pre Release
+      if: ${{ github.ref == 'release' }}
+      id: create_release
+      uses: actions/create-release@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TZ: Asia/Tokyo
+      with:
+        tag_name: ${{ steps.software_version.outputs.version }}-alpha-${{github.sha}}
+        release_name: Release ${{ steps.software_version.outputs.version }}-alpha-${{github.sha}}
+        draft: false
+        prerelease: true
+      
+    # プレリリース作成(develop)
+    - name: Create Pre Release
+      if: ${{ github.ref == 'uat-c2' }}
+      id: create_release
+      uses: actions/create-release@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TZ: Asia/Tokyo
+      with:
+        tag_name: ${{ steps.software_version.outputs.version }}-beta-${{github.sha}}
+        release_name: Release ${{ steps.software_version.outputs.version }}-beta-${{github.sha}}
+        draft: false
+        prerelease: true
+
+    # リリースに資材をUpload(Front: master)
+    - name: Upload Front Release Asset for Production
+      if: ${{ github.ref == 'master' }}
+      id: upload-release-frontend-asset-prod
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TZ: Asia/Tokyo
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./react.tar.gz
+        asset_name: react.tar.gz
+        asset_content_type: application/gzip
+
+    # リリースに資材をUpload(Front: release)
+    - name: Upload Front Release Asset for release
+      if: ${{ github.ref == 'release' }}
+      id: upload-release-frontend-asset-release
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TZ: Asia/Tokyo
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./react.tar.gz
+        asset_name: react.tar.gz
+        asset_content_type: application/gzip
+
+    # リリースに資材をUpload(Front: develop)
+    - name: Upload Front Release Asset for STG
+      if: ${{ github.ref == 'develop' }}
+      id: upload-release-frontend-asset-develop
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TZ: Asia/Tokyo
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./react.tar.gz
+        asset_name: react.tar.gz
+        asset_content_type: application/gzip
