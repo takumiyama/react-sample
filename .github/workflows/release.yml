@@ -23,6 +23,7 @@ jobs:
         VERSION=$(cat package.json | grep version | cut -d " " -f 4 | tr -d "," | tr -d '"')
         echo ::set-output name=version::${VERSION}
         echo ${VERSION}
+        echo ${{ github.ref }}
 
     # Node
     - name: Use Node.js ${{ matrix.node-version }}
