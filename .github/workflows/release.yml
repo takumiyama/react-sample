@@ -23,7 +23,6 @@ jobs:
         VERSION=$(cat package.json | grep version | cut -d " " -f 4 | tr -d "," | tr -d '"')
         echo ::set-output name=version::${VERSION}
         echo ${VERSION}
-        echo ${{ github.ref }}
 
     # Node
     - name: Use Node.js ${{ matrix.node-version }}
@@ -42,13 +41,13 @@ jobs:
       env:
         TZ: Asia/Tokyo
       run: |
-        if [[ ${{ github.ref }} = 'master' ]]; then
+        if [[ ${{ github.ref }} = 'refs/heads/master' ]]; then
           sh ./script/build.sh
           echo "master build"
-        elif [[ ${{ github.ref }} = 'release' ]]; then
+        elif [[ ${{ github.ref }} = 'refs/heads/release' ]]; then
           sh ./script/build.sh
           echo "release build"
-        elif [[ ${{ github.ref }} = 'develop' ]]; then
+        elif [[ ${{ github.ref }} = 'refs/heads/develop' ]]; then
           sh ./script/build.sh
           echo "develop build"
         else
@@ -58,7 +57,7 @@ jobs:
     
     # 本番リリース作成
     - name: Create Production Release
-      if: ${{ github.ref == 'master'}}
+      if: ${{ github.ref == 'refs/heads/master'}}
       id: create_release_prod
       uses: actions/create-release@v1.0.0
       env:
@@ -72,7 +71,7 @@ jobs:
 
     # プレリリース作成(release)
     - name: Create Pre Release
-      if: ${{ github.ref == 'release' }}
+      if: ${{ github.ref == 'refs/heads/release' }}
       id: create_release_stg
       uses: actions/create-release@v1.0.0
       env:
@@ -86,7 +85,7 @@ jobs:
       
     # プレリリース作成(develop)
     - name: Create Pre Release
-      if: ${{ github.ref == 'uat-c2' }}
+      if: ${{ github.ref == 'refs/heads/develop' }}
       id: create_release_dev
       uses: actions/create-release@v1.0.0
       env:
@@ -100,7 +99,7 @@ jobs:
 
     # リリースに資材をUpload(Front: master)
     - name: Upload Front Release Asset for Production
-      if: ${{ github.ref == 'master' }}
+      if: ${{ github.ref == 'refs/heads/master' }}
       id: upload-release-frontend-asset-prod
       uses: actions/upload-release-asset@v1.0.1
       env:
@@ -114,7 +113,7 @@ jobs:
 
     # リリースに資材をUpload(Front: release)
     - name: Upload Front Release Asset for release
-      if: ${{ github.ref == 'release' }}
+      if: ${{ github.ref == 'refs/heads/release' }}
       id: upload-release-frontend-asset-release
       uses: actions/upload-release-asset@v1.0.1
       env:
@@ -128,7 +127,7 @@ jobs:
 
     # リリースに資材をUpload(Front: develop)
     - name: Upload Front Release Asset for STG
-      if: ${{ github.ref == 'develop' }}
+      if: ${{ github.ref == 'refs/heads/develop' }}
       id: upload-release-frontend-asset-develop
       uses: actions/upload-release-asset@v1.0.1
       env:
