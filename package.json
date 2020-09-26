@@ -1,6 +1,6 @@
 {
   "name": "@takumiyama/react-sample",
-  "version": "1.0.0",
+  "version": "v1.0.0",
   "description": "",
   "main": "index.js",
   "publishConfig": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "webpack-dev-server -d --open",
-    "build": "webpack -p",
+    "build": "webpack -p",S
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
