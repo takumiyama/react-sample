@@ -78,8 +78,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TZ: Asia/Tokyo
       with:
-        tag_name: ${{ steps.software_version.outputs.version }}-alpha-${{github.sha}}
-        release_name: Release ${{ steps.software_version.outputs.version }}-alpha-${{github.sha}}
+        tag_name: ${{ steps.software_version.outputs.version }}-alpha-${{github.run_number}}
+        release_name: Release ${{ steps.software_version.outputs.version }}-alpha-${{github.run_number}}
         draft: false
         prerelease: true
       
@@ -92,8 +92,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TZ: Asia/Tokyo
       with:
-        tag_name: ${{ steps.software_version.outputs.version }}-beta-${{github.sha}}
-        release_name: Release ${{ steps.software_version.outputs.version }}-beta-${{github.sha}}
+        tag_name: ${{ steps.software_version.outputs.version }}-beta-${{github.run_number}}
+        release_name: Release ${{ steps.software_version.outputs.version }}-beta-${{github.run_number}}
         draft: false
         prerelease: true
 
