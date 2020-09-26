@@ -58,7 +58,7 @@ jobs:
     # 本番リリース作成
     - name: Create Production Release
       if: ${{ github.ref == 'master'}}
-      id: create_release
+      id: create_release_prod
       uses: actions/create-release@v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
     # プレリリース作成(release)
     - name: Create Pre Release
       if: ${{ github.ref == 'release' }}
-      id: create_release
+      id: create_release_stg
       uses: actions/create-release@v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -86,7 +86,7 @@ jobs:
     # プレリリース作成(develop)
     - name: Create Pre Release
       if: ${{ github.ref == 'uat-c2' }}
-      id: create_release
+      id: create_release_dev
       uses: actions/create-release@v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
